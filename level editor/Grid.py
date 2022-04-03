@@ -1,8 +1,8 @@
 import math
-
+import os
 import pygame
 from Screen import screen, canvas, tile_size, screen_height, world_width
-
+from File import File
 sun_img = pygame.image.load('../img/sun.png')
 sky_img = pygame.image.load('../img/sky.png')
 dirt_img = pygame.image.load('../img/dirt.jpg')
@@ -57,6 +57,7 @@ class Grid:
                 self.action = True
             else:
                 print('Out of grid: ', pos)
+                File.save_file()
         elif pygame.mouse.get_pressed()[2] and not self.action:
             pos = pygame.mouse.get_pos()
             if self.rect.collidepoint(pos):
