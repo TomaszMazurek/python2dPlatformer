@@ -14,8 +14,12 @@ class Grid:
         self.rect = self.image.get_rect()
         self.clicked = False
         self.world = self.create_world()
-        self.tile_list = []
+        self.tile_list = self.create_world()
+        self.action = False
 
+        self.set_background()
+
+    def set_background(self):
         canvas.fill((255, 255, 255))
         canvas.blit(self.image, (0, 0))
         canvas.blit(pygame.transform.scale(sun_img, (tile_size * 4, tile_size * 4)), (100, 100))
@@ -38,22 +42,37 @@ class Grid:
         return world
 
     def update(self):
-        if pygame.mouse.get_pressed()[0]:
+        if pygame.mouse.get_pressed()[0] and not self.action:
             pos = pygame.mouse.get_pos()
-            y = math.floor(pos[1] / tile_size)
-            x = math.floor(pos[0] / tile_size)
-            self.world[x][y] = 1
-            img = pygame.transform.scale(dirt_img, (tile_size, tile_size))
-            img_rect = img.get_rect()
-            img_rect.x = x * tile_size
-            img_rect.y = y * tile_size
-            tile = (img, img_rect)
-            self.tile_list.append(tile)
+            if self.rect.collidepoint(pos):
+                y = math.floor(pos[1] / tile_size)
+                x = math.floor(pos[0] / tile_size)
+                self.world[x][y] = 1
+                img = pygame.transform.scale(dirt_img, (tile_size, tile_size))
+                img_rect = img.get_rect()
+                img_rect.x = x * tile_size
+                img_rect.y = y * tile_size
+                tile = (img, img_rect)
+                self.tile_list[x][y] = tile
+                self.action = True
+            else:
+                print('Out of grid: ', pos)
+        elif pygame.mouse.get_pressed()[2] and not self.action:
+            pos = pygame.mouse.get_pos()
+            if self.rect.collidepoint(pos):
+                y = math.floor(pos[1] / tile_size)
+                x = math.floor(pos[0] / tile_size)
+                self.world[x][y] = 0
+                self.tile_list[x][y] = None
+                self.action = True
+                self.set_background()
+        elif not pygame.mouse.get_pressed()[0] and not pygame.mouse.get_pressed()[2]:
+            self.action = False
 
-
-        for tile in self.tile_list:
-            canvas.blit(tile[0], tile[1])
-
+        for row in self.tile_list:
+            for column in row:
+                if column:
+                    canvas.blit(column[0], column[1])
 
         screen.blit(canvas, (0, 0))
         self.draw_grid()

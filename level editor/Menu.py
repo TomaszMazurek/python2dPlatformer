@@ -1,17 +1,11 @@
-import pygame
-
 from Screen import canvas, world_width, tile_size
-
-dirt_img = pygame.image.load('../img/dirt.jpg')
+from img.utils import get_tiles
 
 
 class Menu:
     def __init__(self):
-        self.tiles = [pygame.transform.scale(dirt_img, (tile_size, tile_size))
-]
+        self.tiles = get_tiles(tile_size - 6)
 
     def update(self):
-        canvas.blit(self.tiles[0], (world_width, 0))
-
-
-
+        for i in range(0, len(self.tiles)):
+            canvas.blit(self.tiles[i], (world_width, (tile_size * i + 3)))
