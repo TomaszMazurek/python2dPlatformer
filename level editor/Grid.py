@@ -1,8 +1,9 @@
 import math
-import os
 import pygame
 from Screen import screen, canvas, tile_size, screen_height, world_width
 from File import File
+from img.utils import get_tiles, resize
+
 sun_img = pygame.image.load('../img/sun.png')
 sky_img = pygame.image.load('../img/sky.png')
 dirt_img = pygame.image.load('../img/dirt.jpg')
@@ -14,8 +15,10 @@ class Grid:
         self.rect = self.image.get_rect()
         self.clicked = False
         self.world = self.create_world()
-        self.tile_list = self.create_world()
+        self.world_tile_list = self.create_world()
+        self.tile_list = get_tiles(tile_size)
         self.action = False
+        self.selected_tile = 0
 
         self.set_background()
 
@@ -34,43 +37,70 @@ class Grid:
     def create_world(self):
         world = []
         world_w = int(world_width/tile_size)
-        world_h = int(world_width/tile_size)
-        for line in range(0, world_w):
-            lst = [0] * world_h
+        world_h = int(screen_height/tile_size)
+        for line in range(0, world_h):
+            lst = [0] * world_w
             world.append(lst)
 
         return world
 
+
+    def update_world_tile_list(self):
+        world_tile_list = self.create_world()
+        for line in range(0, len(world_tile_list)):
+            for tile in range(0, len(world_tile_list[line])):
+                tile_id = self.world[line][tile]
+                if tile_id > 0:
+                        img = self.tile_list[tile_id - 1]
+                        img_rect = img.get_rect()
+                        img_rect.x = tile * tile_size
+                        img_rect.y = line * tile_size
+                        if resize.get(tile_id - 1):
+                            img_rect.y = img_rect.y + (tile_size // 2)
+                        new_tile = (img, img_rect)
+                        world_tile_list[line][tile] = new_tile
+
+        self.world_tile_list = world_tile_list
+        self.set_background()
+
+
     def update(self):
         if pygame.mouse.get_pressed()[0] and not self.action:
             pos = pygame.mouse.get_pos()
+            x = math.floor(pos[0] / tile_size)
+            y = math.floor(pos[1] / tile_size)
             if self.rect.collidepoint(pos):
-                y = math.floor(pos[1] / tile_size)
-                x = math.floor(pos[0] / tile_size)
-                self.world[x][y] = 1
-                img = pygame.transform.scale(dirt_img, (tile_size, tile_size))
+                self.world[y][x] = self.selected_tile + 1
+                img = self.tile_list[self.selected_tile]
                 img_rect = img.get_rect()
                 img_rect.x = x * tile_size
                 img_rect.y = y * tile_size
+                if resize.get(self.selected_tile):
+                    img_rect.y = img_rect.y + (tile_size // 2)
                 tile = (img, img_rect)
-                self.tile_list[x][y] = tile
-                self.action = True
+                self.world_tile_list[y][x] = tile
             else:
-                print('Out of grid: ', pos)
-                File.save_file()
+                if pos[1] > (screen_height - tile_size):
+                    File.save_file(self.world)
+                elif pos[1] > (screen_height - tile_size * 2):
+                    self.world = File.load_file()
+                    self.update_world_tile_list()
+                else:
+                    self.selected_tile = y
+            self.action = True
         elif pygame.mouse.get_pressed()[2] and not self.action:
             pos = pygame.mouse.get_pos()
             if self.rect.collidepoint(pos):
-                y = math.floor(pos[1] / tile_size)
                 x = math.floor(pos[0] / tile_size)
-                self.world[x][y] = 0
-                self.tile_list[x][y] = None
+                y = math.floor(pos[1] / tile_size)
+                self.world[y][x] = 0
+                self.world_tile_list[y][x] = None
                 self.action = True
                 self.set_background()
         elif not pygame.mouse.get_pressed()[0] and not pygame.mouse.get_pressed()[2]:
             self.action = False
 
-        for row in self.tile_list:
+        for row in self.world_tile_list:
             for column in row:
                 if column:
                     canvas.blit(column[0], column[1])
