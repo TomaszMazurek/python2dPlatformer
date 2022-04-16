@@ -2,11 +2,11 @@ import math
 import pygame
 from Screen import screen, canvas, tile_size, screen_height, world_width
 from File import File
-from img.utils import get_tiles, resize
+from img.utils import get_tiles, resize, get_image
 
-sun_img = pygame.image.load('../img/sun.png')
-sky_img = pygame.image.load('../img/sky.png')
-dirt_img = pygame.image.load('../img/dirt.jpg')
+sun_img = get_image('sun.png')
+sky_img = get_image('sky.png')
+dirt_img = get_image('dirt.jpg')
 
 
 class Grid:
