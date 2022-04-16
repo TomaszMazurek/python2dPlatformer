@@ -99,7 +99,7 @@ class Player:
                 if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
                     #check if below the ground i.e. jumping
                     if self.vel_y < 0:
-                        dy = tile[1].bottom = self.rect.top
+                        dy = tile[1].bottom - self.rect.top
                         self.vel_y = 0
                     elif self.vel_y >= 0:
                         dy = tile[1].top - self.rect.bottom

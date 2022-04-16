@@ -1,5 +1,5 @@
 import pygame
-from Game import screen
+from Game import canvas
 
 
 class Button():
@@ -12,8 +12,6 @@ class Button():
 
     def draw(self):
         action = False
-
-        # get mouse position
         pos = pygame.mouse.get_pos()
 
         # check mouseover and clicked conditions
@@ -22,10 +20,10 @@ class Button():
                 action = True
                 self.clicked = True
 
-        if pygame.mouse.get_pressed()[0] == 0:
-            self.clicked = False
+            if pygame.mouse.get_pressed()[0] == 0:
+                self.clicked = False
 
         # draw button
-        screen.blit(self.image, self.rect,)
+        canvas.blit(self.image, self.rect,)
 
         return action

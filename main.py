@@ -115,7 +115,8 @@ if __name__ == '__main__':
                         level = 1
                         world_data = []
                 world = reset_level(level)
-            screen.blit(canvas, (0, 0))
+
+        screen.blit(canvas, (0, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
